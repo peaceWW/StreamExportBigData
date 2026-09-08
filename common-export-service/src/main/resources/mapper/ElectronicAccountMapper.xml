@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.biz.ElectronicAccountMapper">
+
+    <select id="pageCount" resultType="java.lang.Integer">
+        select count(*)
+        from electronic_account
+        <where>
+            <include refid="pageCondition"/>
+        </where>
+    </select>
+
+    <select id="pageList" resultType="cn.sdpjw.export.entity.ElectronicAccount">
+        select *
+        from electronic_account
+        <where>
+            <include refid="pageCondition"/>
+        </where>
+        order by updated_at desc
+    </select>
+
+    <sql id="pageCondition">
+        logout_flag = 0
+        <if test="accountName != null and accountName != ''">
+            and account_name like concat('%',#{accountName},'%')
+        </if>
+        <if test="paymentChannelList != null and paymentChannelList.size() > 0">
+            and payment_channel in
+            <foreach collection="paymentChannelList" open="(" close=")" separator="," item="paymentChannel">
+                #{paymentChannel}
+            </foreach>
+        </if>
+        <if test="signStatus != null">
+            and sign_status = #{signStatus}
+        </if>
+        <if test="accountStatus != null">
+            and account_status = #{accountStatus}
+        </if>
+        <if test="banStatus != null">
+            and ban_status = #{banStatus}
+        </if>
+        <if test="turnOnStatus != null">
+            and turn_on_status = #{turnOnStatus}
+        </if>
+        <if test="signDisableStatus != null">
+            and sign_disable_status = #{signDisableStatus}
+        </if>
+    </sql>
+</mapper>

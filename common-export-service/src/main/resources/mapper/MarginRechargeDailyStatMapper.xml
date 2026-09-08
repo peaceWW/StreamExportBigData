@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.biz.MarginRechargeDailyStatMapper">
+
+    <select id="pageCount" resultType="java.lang.Integer">
+        select count(*)
+        from margin_recharge_daily_report
+        <where>
+            <include refid="pageCondition"/>
+        </where>
+    </select>
+
+    <select id="pageList" resultType="cn.sdpjw.export.entity.MarginRechargeDailyStat">
+        select *
+        from margin_recharge_daily_report
+        <where>
+            <include refid="pageCondition"/>
+        </where>
+        order by stat_date desc, dict_pay_type asc
+    </select>
+
+    <sql id="pageCondition">
+        <if test="startDate != null and startDate != ''">
+            and stat_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and stat_date &lt;= #{endDate}
+        </if>
+        <if test="dictPayType != null">
+            and dict_pay_type = #{dictPayType}
+        </if>
+    </sql>
+</mapper>

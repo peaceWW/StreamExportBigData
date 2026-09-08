@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.ExportRecordMapper">
+
+    <select id="listRecords" resultType="cn.sdpjw.export.stub.dto.ExportRecordVO">
+        SELECT
+            id,
+            task_id,
+            menu_code,
+            operator_employee_id,
+            operator_name,
+            subscriber_app,
+            data_source_key,
+            query_params,
+            export_url,
+            export_name,
+            file_format,
+            processed_rows,
+            total_rows,
+            progress,
+            status,
+            error_message,
+            received_at,
+            export_time,
+            checkpoint_last_id,
+            checkpoint_part_no,
+            temp_file_path,
+            retry_count,
+            created_at,
+            updated_at
+        FROM export_data_task
+        <where>
+            <if test="query.employeeId != null">
+                AND operator_employee_id = #{query.employeeId}
+            </if>
+            <if test="query.menuCode != null and query.menuCode != ''">
+                AND menu_code = #{query.menuCode}
+            </if>
+            <if test="query.status != null">
+                AND status = #{query.status}
+            </if>
+            <if test="query.subscriberApp != null and query.subscriberApp != ''">
+                AND subscriber_app = #{query.subscriberApp}
+            </if>
+            <if test="query.startTime != null">
+                AND created_at &gt;= #{query.startTime}
+            </if>
+            <if test="query.endTime != null">
+                AND created_at &lt;= #{query.endTime}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,36 @@
+-- 公共导出元数据库 export_meta
+-- core（ExportTask）与业务层（ExportRecord）共用 export_data_record，字段分工见 ExportRecordService 注释
+
+CREATE TABLE IF NOT EXISTS export_data_record (
+    id                  BIGINT       NOT NULL COMMENT '主键',
+    task_id             VARCHAR(64)  NOT NULL COMMENT '任务ID',
+    menu_code           VARCHAR(128) NULL COMMENT '业务 menuCode（业务扩展）',
+    operator_employee_id INT         NULL COMMENT '操作人（core 写入）',
+    operator_name       VARCHAR(64)  NULL COMMENT '操作人姓名（业务扩展）',
+    subscriber_app      VARCHAR(64)  NULL COMMENT '调用方应用（业务扩展）',
+    data_source_key     VARCHAR(64)  NULL COMMENT '逻辑数据源（业务扩展）',
+    query_params        TEXT         NULL COMMENT '查询条件 JSON（业务扩展）',
+    export_url          VARCHAR(500) NULL COMMENT 'OSS 地址（core 写入）',
+    export_name         VARCHAR(255) NULL COMMENT '文件名（core 写入 filename）',
+    file_format         VARCHAR(16)  NULL COMMENT '文件格式（业务扩展）',
+    filename            VARCHAR(264) NULL COMMENT '文件名（业务扩展）',
+    processed_rows      BIGINT       NULL DEFAULT 0 COMMENT '已处理行数（core 写入）',
+    progress            INT          NULL DEFAULT 0 COMMENT '进度（core 写入）',
+    total_rows          BIGINT       NULL COMMENT '总量（core 写入）',
+    status              TINYINT      NOT NULL COMMENT '状态（core 写入；RECOVERABLE 由业务扩展）',
+    error_message       TEXT         NULL COMMENT '错误信息（core 写入）',
+    checkpoint_last_id  VARCHAR(64)  NULL COMMENT '断点游标（业务扩展）',
+    checkpoint_part_no  INT          NULL DEFAULT 0 COMMENT '分片序号（业务扩展）',
+    temp_file_path      VARCHAR(500) NULL COMMENT '临时文件路径（业务扩展）',
+    retry_count         INT          NOT NULL DEFAULT 0 COMMENT '重试次数（业务扩展）',
+    received_at         DATETIME(6)  NULL COMMENT '接收时间（业务扩展）',
+    export_time         DATETIME     NULL COMMENT '完成时间（业务扩展）',
+    updated_at          DATETIME(6)  NOT NULL COMMENT '更新时间（core 写入）',
+    created_at          DATETIME(6)  NOT NULL COMMENT '创建时间（core 写入）',
+    version             INT          NOT NULL DEFAULT 0 COMMENT '乐观锁（业务扩展）',
+    menu_type           INT          NULL COMMENT '菜单类型（core 可选）',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_task_id (task_id),
+    KEY idx_operator_created (operator_employee_id, created_at),
+    KEY idx_menu_status (menu_code, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='导出任务（core 执行态 + 业务扩展字段）';

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.biz.MarginDetailMapper">
+
+    <resultMap id="MarginDetailExcelMap" type="cn.sdpjw.export.entity.MarginDetail">
+        <result column="corp_name"        property="corpName"/>
+        <result column="master_mobile"    property="masterMobile"/>
+        <result column="balance_type"     property="balanceType"/>
+        <result column="detail_type"      property="detailType"/>
+        <result column="margin_type"      property="marginType"/>
+        <result column="change_amt"       property="changeAmt"/>
+        <result column="biz_serial_id"    property="bizSerialId"/>
+        <result column="memo"             property="memo"/>
+        <result column="inner_memo"       property="innerMemo"/>
+        <result column="create_time"      property="createTime"/>
+        <result column="operation_name"   property="operationName"/>
+    </resultMap>
+
+    <select id="pageCount" resultType="java.lang.Integer">
+        select count(*) as countNum
+        from `margin_detail` d
+        <include refid="countCondition"/>
+    </select>
+
+    <select id="pageList" resultMap="MarginDetailExcelMap">
+        select
+            c.corp_name,
+            c.master_mobile,
+            d.balance_type,
+            d.detail_type,
+            d.margin_type,
+            d.change_amt,
+            d.biz_serial_id,
+            d.memo,
+            d.inner_memo,
+            d.create_time,
+            d.operation_name,
+            a.`corp_id`,
+            a.`account_name`
+        from
+        <choose>
+            <when test="env == 'dev'">
+                `margin_detail` d, `margin_account` a, `trader_corp` c
+            </when>
+            <otherwise>
+                `coin`.`margin_detail` d, `coin`.`margin_account` a, `corp`.`trader_corp` c
+            </otherwise>
+        </choose>
+        <include refid="pageCondition"/>
+        order by d.create_time desc
+    </select>
+
+    <sql id="countCondition">
+        <where>
+            <if test="marginAccountId != null ">and d.margin_account_id = #{marginAccountId}</if>
+            <!-- 已换算主键区间时，用 id 收窄扫描；不再依赖 create_time 走二级索引大范围 -->
+            <if test="startTime != null ">and d.create_time &gt;= #{startTime}</if>
+            <if test="endTime != null ">and d.create_time &lt;= #{endTime}</if>
+            <if test="bizSerialId != null and bizSerialId != ''">and d.biz_serial_id=#{bizSerialId}</if>
+            <if test="balanceType != null ">and d.balance_type=#{balanceType}</if>
+            <if test="detailType != null ">and d.detail_type=#{detailType}</if>
+            <if test="marginType != null ">and d.margin_type=#{marginType}</if>
+            <if test="memo != null and memo != ''">and d.memo like concat(#{memo},'%')</if>
+            <if test="innerMemo != null and innerMemo != ''">and d.inner_memo like concat(#{innerMemo},'%')</if>
+        </where>
+    </sql>
+
+    <sql id="pageCondition">
+        <where>
+            d.`margin_account_id` = a.margin_account_id and c.`id` = a.`corp_id`
+            <if test="marginAccountId != null ">and d.margin_account_id = #{marginAccountId}</if>
+            <!-- 已换算主键区间时，用 id 收窄扫描；不再依赖 create_time 走二级索引大范围 -->
+            <if test="startTime != null ">and d.create_time &gt;= #{startTime}</if>
+            <if test="endTime != null ">and d.create_time &lt;= #{endTime}</if>
+            <if test="bizSerialId != null and bizSerialId != ''">and d.biz_serial_id=#{bizSerialId}</if>
+            <if test="balanceType != null ">and d.balance_type=#{balanceType}</if>
+            <if test="detailType != null ">and d.detail_type=#{detailType}</if>
+            <if test="marginType != null ">and d.margin_type=#{marginType}</if>
+            <if test="memo != null and memo != ''">and d.memo like concat(#{memo},'%')</if>
+            <if test="innerMemo != null and innerMemo != ''">and d.inner_memo like concat(#{innerMemo},'%')</if>
+        </where>
+    </sql>
+
+
+</mapper>

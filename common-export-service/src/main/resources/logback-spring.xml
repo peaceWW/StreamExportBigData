@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--<include resource="org/springframework/boot/logging/logback/base.xml"/>-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <logger name="org.springframework.web" level="INFO"/>
+    <!-- shardingsphere 日志 过滤info级别日志 减少日志量 -->
+    <logger name="ShardingSphere-SQL" level="WARN"/>
+
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return message.contains("SELECT 1");</expression>
+            </evaluator>
+            <OnMismatch>NEUTRAL</OnMismatch>
+            <OnMatch>DENY</OnMatch>
+        </filter>
+        <encoder>
+            <charset>utf-8</charset>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss}]|%-5p|[%X{traceId}][%X{EagleEye-TraceID}] %t %C{36} %L %M %m%n</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- 开发、测试 -->
+    <springProfile name="local,dev,qa,staging">
+        <logger name="org.springframework.web" level="INFO"/>
+        <logger name="cn.sdpjw" level="DEBUG"/>
+        <logger name="com.alibaba" level="WARN"/>
+        <logger name="RocketmqClient" level="ERROR"/>
+        <logger name="RocketmqRemoting" level="ERROR"/>
+    </springProfile>
+
+    <!-- 生产 -->
+    <springProfile name="prod">
+        <logger name="org.springframework.web" level="INFO"/>
+        <logger name="cn.sdpjw" level="DEBUG"/>
+        <logger name="com.alibaba" level="WARN"/>
+        <logger name="RocketmqClient" level="ERROR"/>
+        <logger name="RocketmqRemoting" level="ERROR"/>
+    </springProfile>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

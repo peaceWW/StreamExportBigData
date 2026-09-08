@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.biz.MarginDetailOfflineMapper">
+
+    <resultMap id="MarginDetailExcelMap" type="cn.sdpjw.export.entity.MarginDetail">
+        <result column="corp_name"        property="corpName"/>
+        <result column="master_mobile"    property="masterMobile"/>
+        <result column="balance_type"     property="balanceType"/>
+        <result column="detail_type"      property="detailType"/>
+        <result column="margin_type"      property="marginType"/>
+        <result column="margin_account_id" property="marginAccountId"/>
+        <result column="change_amt"       property="changeAmt"/>
+        <result column="biz_serial_id"    property="bizSerialId"/>
+        <result column="memo"             property="memo"/>
+        <result column="inner_memo"       property="innerMemo"/>
+        <result column="create_time"      property="createTime"/>
+        <result column="operation_name"   property="operationName"/>
+    </resultMap>
+
+    <select id="pageCount" resultType="java.lang.Integer">
+        select count(*) as countNum
+        from `margin_detail_offline` d
+        <include refid="pageCondition"/>
+    </select>
+
+    <select id="pageList" resultMap="MarginDetailExcelMap">
+        select
+            balance_type,
+            detail_type,
+            margin_account_id,
+            margin_type,
+            change_amt,
+            biz_serial_id,
+            memo,
+            create_time,
+            operation_name
+        from margin_detail_offline
+        <include refid="pageCondition"/>
+        order by create_time desc
+    </select>
+
+    <sql id="pageCondition">
+        <where>
+            <!-- margin_account_id in (10000,100002) -->
+            <if test="startTime != null ">and create_time &gt;= #{startTime}</if>
+            <if test="endTime != null ">and create_time &lt;= #{endTime}</if>
+            <if test="bizSerialId != null and bizSerialId != ''">and biz_serial_id=#{bizSerialId}</if>
+            <if test="balanceType != null ">and balance_type=#{balanceType}</if>
+            <if test="detailType != null ">and detail_type=#{detailType}</if>
+            <if test="marginType != null ">and margin_type=#{marginType}</if>
+            <if test="memo != null and memo != ''">and memo=#{memo}</if>
+            <if test="innerMemo != null and innerMemo != ''">and inner_memo=#{innerMemo}</if>
+        </where>
+    </sql>
+
+
+</mapper>

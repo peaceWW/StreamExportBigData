@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.biz.RewardDailyReportMapper">
+
+    <select id="pageCount" resultType="java.lang.Integer">
+        select count(*)
+        from reward_daily_report
+        <where>
+            <include refid="pageCondition"/>
+        </where>
+    </select>
+
+    <select id="pageList" resultType="cn.sdpjw.export.entity.RewardDailyReport">
+        select *
+        from reward_daily_report
+        <where>
+            <include refid="pageCondition"/>
+        </where>
+        order by business_date desc
+    </select>
+
+    <sql id="pageCondition">
+        <if test="startDate != null and startDate != ''">
+            and business_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and business_date &lt;= #{endDate}
+        </if>
+    </sql>
+</mapper>

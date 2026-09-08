@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.base</groupId>
+    <artifactId>common-export-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>common-export-parent</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <guava.version>18.0</guava.version>
+        <mybatisplus.version>3.2.0</mybatisplus.version>
+        <commons-pool2.version>2.5.0</commons-pool2.version>
+        <sharding-sphere.version>4.1.1</sharding-sphere.version>
+        <fastjson.version>1.2.59</fastjson.version>
+        <rocketmq.starter.version>2.0.3</rocketmq.starter.version>
+        <jetcache-starter-redis.version>2.6.0</jetcache-starter-redis.version>
+    </properties>
+
+    <modules>
+        <module>common-export-service</module>
+        <module>common-export-stub</module>
+    </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>rdc-releases</id>
+            <name>Releases</name>
+            <url>https://packages.aliyun.com/maven/repository/2458978-release-o2e8EC/</url>
+        </repository>
+        <snapshotRepository>
+            <id>rdc-snapshots</id>
+            <name>Snapshot</name>
+            <url>https://packages.aliyun.com/maven/repository/2458978-snapshot-PCcNlZ/</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>

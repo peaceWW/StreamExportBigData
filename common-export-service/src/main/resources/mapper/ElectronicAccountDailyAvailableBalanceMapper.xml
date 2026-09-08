@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.biz.ElectronicAccountDailyAvailableBalanceMapper">
+
+    <select id="pageCount" resultType="java.lang.Integer">
+        select count(*) from electronic_account_daily_available_balance
+        <include refid="commonWhereClause"/>
+    </select>
+
+    <select id="pageList" resultType="cn.sdpjw.export.entity.ElectronicAccountDailyAvailableBalance">
+        select * from electronic_account_daily_available_balance
+        <include refid="commonWhereClause"/>
+    </select>
+
+
+    <sql id="commonWhereClause">
+        <where>
+            <if test="channel != null">
+                and payment_channel = #{channel}
+            </if>
+            <if test="corpName != null">
+                and trader_corp_name like CONCAT('%', #{corpName}, '%')
+            </if>
+            <if test="startDate != null">
+                and query_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and query_date &lt;= #{endDate}
+            </if>
+            <if test="customerManagerEmployeeIds != null and customerManagerEmployeeIds.size() > 0">
+                and customer_manager_employee_id in
+                <foreach collection="customerManagerEmployeeIds" open="(" close=")" separator="," item="customerId">
+                    #{customerId}
+                </foreach>
+            </if>
+            <if test="customerManagerDeptIds != null and customerManagerDeptIds.size() > 0">
+                and customer_manager_department_id in
+                <foreach collection="customerManagerDeptIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="registerType != null">
+                and register_type = #{registerType}
+            </if>
+        </where>
+    </sql>
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.biz.TraderCorpMemberThreeElementsManagerMapper">
+    <select id="pageCount" resultType="java.lang.Integer">
+        select count(*) from trader_corp_member_three_elements_manager
+        <where>
+            <include refid="pageCondition" />
+        </where>
+    </select>
+
+    <select id="pageList" resultType="cn.sdpjw.export.entity.TraderCorpMemberThreeElementsManager">
+        select * from trader_corp_member_three_elements_manager
+        <where>
+            <include refid="pageCondition" />
+        </where>
+        order by created_at desc
+    </select>
+
+    <sql id="pageCondition">
+        deleted_flag = 0
+        <if test="corpName != null and corpName != ''">
+            and corp_name like concat('%', #{corpName}, '%')
+        </if>
+        <if test="checkItem != null">
+            and check_item = #{checkItem}
+        </if>
+        <if test="openStatus != null">
+            and open_status = #{openStatus}
+        </if>
+    </sql>
+</mapper>

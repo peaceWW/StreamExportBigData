@@ -1,0 +1,63 @@
+spring.application.name: common-export-service-local
+spring.cloud.nacos.config.enabled: false
+
+dubbo:
+  scan:
+    base-packages: cn.sdpjw.export.provider
+  registry:
+    address: nacos://10.10.30.131:8848/?namespace=public
+  consumer:
+    check: false
+    timeout: 10000
+  provider:
+    timeout: 10000
+    version: 1.0.0
+
+spring:
+  datasource:
+    dynamic:
+      primary: meta
+      strict: false
+      datasource:
+        meta:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://rm-2zebg8olus9nkj0jcwo.mysql.rds.aliyuncs.com/dj_dev?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+          username: dj_dev
+          password: OnnXnzqukrgMtea0
+        ds_electronic_account:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://rm-2zebg8olus9nkj0jcwo.mysql.rds.aliyuncs.com/dj_dev?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+          username: dj_dev
+          password: OnnXnzqukrgMtea0
+
+export:
+  datasource-routing:
+    demo: ds_electronic_account
+    m_corp_manage_channel_list_export: ds_electronic_account
+    m_finance_margin_recharge_daily_report: ds_electronic_account
+    m_finance_reward_daily_report: ds_electronic_account
+    m_finance_gift_daily_report: ds_electronic_account
+    m_finance_market_exchange_daily_report: ds_electronic_account
+  stream:
+    enrich-timeout-seconds: 5  # 数据增强超时时间（秒），默认5秒，设置为0表示不限制
+    max-export-rows: 500000    # 导出条数上限（可选，不配置则不限制；如果配置且大于0，则按此上限导出）
+    batch-size: 5000          # 批次大小（减小以确保立即写入文件）
+    csv-max-rows: 10000        # 单个CSV最大行数
+    zip-enabled: false        # 是否启用ZIP压缩
+    charset: UTF-8            # 文件编码
+    auto-upload: true        # 是否自动上传
+    cleanup-local: true       # 上传后是否清理本地文件
+    temp-dir: ./export/temp   # 临时目录
+    export-dir: ./export      # 导出目录
+    upload-type: oss        # 上传类型：local/oss/ftp
+  # 阿里云OSS配置（用于OSS上传）
+  oss:
+    access-key-id:             # OSS AccessKey ID
+    access-key-secret:
+    endpoint:            # 公网区域 endpoint（本地开发使用）
+    immEndpoint:
+    bucket-name:
+    internal:      # 内网 endpoint（仅阿里云同地域 ECS 可用）
+    use-internal:                                  # 本地开发必须为 false；生产部署在阿里云内网时可设 true
+    host:         # 返回给外部的自定义域名/CDN
+    expired:

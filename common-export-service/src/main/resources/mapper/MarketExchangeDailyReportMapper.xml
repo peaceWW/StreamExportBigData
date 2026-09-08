@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdpjw.export.dao.biz.MarketExchangeDailyReportMapper">
+
+    <select id="pageCount" resultType="java.lang.Integer">
+        select count(*)
+        from market_exchange_daily_report
+        <where>
+            <include refid="pageCondition"/>
+        </where>
+    </select>
+
+    <select id="pageList" resultType="cn.sdpjw.export.entity.MarketExchangeDailyReport">
+        select *
+        from market_exchange_daily_report
+        <where>
+            <include refid="pageCondition"/>
+        </where>
+        order by exchange_date desc, exchange_way asc
+    </select>
+
+    <sql id="pageCondition">
+        <if test="startDate != null and startDate != ''">
+            and exchange_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and exchange_date &lt;= #{endDate}
+        </if>
+        <if test="exchangeWay != null">
+            and exchange_way = #{exchangeWay}
+        </if>
+    </sql>
+</mapper>

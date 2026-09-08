@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统一导出服务 - 接口演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .config-bar {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-bar label {
+            font-weight: 600;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .config-bar input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .config-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-btn.active {
+            background: #fff;
+            color: #667eea;
+            border-color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .tab-desc {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .api-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .api-info .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+
+        .method-get {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .method-post {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .api-info .url {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: #fff;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-box pre {
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .result-box .success {
+            color: #4ec9b0;
+        }
+
+        .result-box .error {
+            color: #f44747;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .task-id-display {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>统一导出服务 - 接口演示</h1>
+
+    <div class="config-bar">
+        <div class="config-row">
+            <label>服务地址:</label>
+            <input type="text" id="baseUrl" value="" placeholder="自动获取当前地址">
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('create')">创建导出任务</button>
+        <button class="tab-btn" onclick="switchTab('progress')">查询进度</button>
+        <button class="tab-btn" onclick="switchTab('records')">导出记录列表</button>
+        <button class="tab-btn" onclick="switchTab('taskList')">任务列表</button>
+        <button class="tab-btn" onclick="switchTab('download')">下载文件</button>
+        <button class="tab-btn" onclick="switchTab('cancel')">取消任务</button>
+        <button class="tab-btn" onclick="switchTab('retry')">重试任务</button>
+    </div>
+
+    <div id="tab-create" class="tab-content active">
+        <div class="tab-title">创建导出任务</div>
+        <div class="tab-desc">POST /api/export/create - 创建一个新的数据导出任务</div>
+        <div class="api-info">
+            <span class="method method-post">POST</span>
+            <span class="url">/api/export/create</span>
+        </div>
+        <div class="form-group">
+            <label>请求体 (JSON):</label>
+            <textarea id="createRequest">{
+    "userInfo": {
+        "employeeId": 1001,
+        "employeeName": "张三",
+        "deptCode": "DEPT001",
+        "subscriberApp": "web-app"
+    },
+    "menuCode": "order-export",
+    "clientRequestTime": "2026-07-04T10:00:00",
+    "query": {
+        "startDate": "2026-01-01",
+        "endDate": "2026-07-04",
+        "status": 1
+    }
+}</textarea>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="createExport()">创建导出任务</button>
+        </div>
+        <div id="createResult" class="result-box" style="display:none;">
+            <pre></pre>
+        </div>
+    </div>
+
+    <div id="tab-progress" class="tab-content">
+        <div class="tab-title">查询导出进度</div>
+        <div class="tab-desc">GET /api/export/progress/{taskId} - 查询指定任务的导出进度</div>
+        <div class="api-info">
+            <span class="method method-get">GET</span>
+            <span class="url">/api/export/progress/{taskId}</span>
+        </div>
+        <div class="form-group">
+            <label>任务ID (taskId):</label>
+            <input type="text" id="progressTaskId" placeholder="请输入任务ID">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="getProgress()">查询进度</button>
+            <button class="btn btn-success" onclick="startAutoRefresh()">自动刷新</button>
+            <button class="btn btn-danger" onclick="stopAutoRefresh()">停止刷新</button>
+        </div>
+        <div id="progressResult" class="result-box" style="display:none;">
+            <pre></pre>
+        </div>
+        <div id="progressBar" class="progress-bar" style="display:none;">
+            <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+        </div>
+    </div>
+
+    <div id="tab-records" class="tab-content">
+        <div class="tab-title">导出记录列表</div>
+        <div class="tab-desc">POST /api/export/records - 分页查询导出记录</div>
+        <div class="api-info">
+            <span class="method method-post">POST</span>
+            <span class="url">/api/export/records</span>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>员工ID:</label>
+                <input type="number" id="recordEmployeeId" placeholder="可选">
+            </div>
+            <div class="form-group">
+                <label>菜单编码:</label>
+                <input type="text" id="recordMenuCode" placeholder="可选">
+            </div>
+            <div class="form-group">
+                <label>状态:</label>
+                <select id="recordStatus">
+                    <option value="">全部</option>
+                    <option value="0">待处理</option>
+                    <option value="1">处理中</option>
+                    <option value="2">成功</option>
+                    <option value="3">失败</option>
+                    <option value="4">已取消</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>订阅应用:</label>
+                <input type="text" id="recordSubscriberApp" placeholder="可选">
+            </div>
+            <div class="form-group">
+                <label>开始时间:</label>
+                <input type="datetime-local" id="recordStartTime">
+            </div>
+            <div class="form-group">
+                <label>结束时间:</label>
+                <input type="datetime-local" id="recordEndTime">
+            </div>
+            <div class="form-group">
+                <label>页码:</label>
+                <input type="number" id="recordPageNum" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>每页数量:</label>
+                <input type="number" id="recordPageSize" value="20" min="1" max="100">
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="listRecords()">查询记录</button>
+        </div>
+        <div id="recordsResult" class="result-box" style="display:none;">
+            <pre></pre>
+        </div>
+    </div>
+
+    <div id="tab-taskList" class="tab-content">
+        <div class="tab-title">任务列表查询</div>
+        <div class="tab-desc">GET /api/export/list - 分页查询导出任务列表</div>
+        <div class="api-info">
+            <span class="method method-get">GET</span>
+            <span class="url">/api/export/list</span>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>页码:</label>
+                <input type="number" id="taskPageNum" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>每页数量:</label>
+                <input type="number" id="taskPageSize" value="20" min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label>状态:</label>
+                <select id="taskStatus">
+                    <option value="">全部</option>
+                    <option value="0">待处理</option>
+                    <option value="1">处理中</option>
+                    <option value="2">成功</option>
+                    <option value="3">失败</option>
+                </select>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="listTasks()">查询任务</button>
+        </div>
+        <div id="taskListResult" class="result-box" style="display:none;">
+            <pre></pre>
+        </div>
+    </div>
+
+    <div id="tab-download" class="tab-content">
+        <div class="tab-title">下载导出文件</div>
+        <div class="tab-desc">GET /api/export/download/{taskId} - 下载已完成的导出文件</div>
+        <div class="api-info">
+            <span class="method method-get">GET</span>
+            <span class="url">/api/export/download/{taskId}</span>
+        </div>
+        <div class="form-group">
+            <label>任务ID (taskId):</label>
+            <input type="text" id="downloadTaskId" placeholder="请输入任务ID">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="downloadFile()">下载文件</button>
+            <button class="btn btn-primary" onclick="getDownloadUrl()">获取下载URL</button>
+        </div>
+        <div id="downloadResult" class="result-box" style="display:none;">
+            <pre></pre>
+        </div>
+    </div>
+
+    <div id="tab-cancel" class="tab-content">
+        <div class="tab-title">取消导出任务</div>
+        <div class="tab-desc">POST /api/export/cancel/{taskId} - 取消正在执行的导出任务</div>
+        <div class="api-info">
+            <span class="method method-post">POST</span>
+            <span class="url">/api/export/cancel/{taskId}</span>
+        </div>
+        <div class="form-group">
+            <label>任务ID (taskId):</label>
+            <input type="text" id="cancelTaskId" placeholder="请输入任务ID">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-danger" onclick="cancelExport()">取消任务</button>
+        </div>
+        <div id="cancelResult" class="result-box" style="display:none;">
+            <pre></pre>
+        </div>
+    </div>
+
+    <div id="tab-retry" class="tab-content">
+        <div class="tab-title">重试导出任务</div>
+        <div class="tab-desc">POST /api/export/retry/{taskId} - 重试失败的导出任务</div>
+        <div class="api-info">
+            <span class="method method-post">POST</span>
+            <span class="url">/api/export/retry/{taskId}</span>
+        </div>
+        <div class="form-group">
+            <label>任务ID (taskId):</label>
+            <input type="text" id="retryTaskId" placeholder="请输入任务ID">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-warning" onclick="retryExport()">重试任务</button>
+        </div>
+        <div id="retryResult" class="result-box" style="display:none;">
+            <pre></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    let autoRefreshTimer = null;
+
+    function getBaseUrl() {
+        const input = document.getElementById('baseUrl').value.trim();
+        if (input) {
+            return input.replace(/\/$/, '');
+        }
+        return window.location.origin;
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function showResult(elementId, data, isError) {
+        const box = document.getElementById(elementId);
+        box.style.display = 'block';
+        const pre = box.querySelector('pre');
+        pre.className = isError ? 'error' : 'success';
+        pre.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    }
+
+    async function apiRequest(url, method, body) {
+        const options = {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+        if (body && method !== 'GET') {
+            options.body = JSON.stringify(body);
+        }
+        const response = await fetch(url, options);
+        return response.json();
+    }
+
+    async function createExport() {
+        const baseUrl = getBaseUrl();
+        let requestData;
+        try {
+            requestData = JSON.parse(document.getElementById('createRequest').value);
+        } catch (e) {
+            showResult('createResult', 'JSON格式错误: ' + e.message, true);
+            return;
+        }
+        try {
+            const result = await apiRequest(baseUrl + '/api/export/create', 'POST', requestData);
+            showResult('createResult', result, false);
+            if (result.data) {
+                document.getElementById('progressTaskId').value = result.data;
+                document.getElementById('downloadTaskId').value = result.data;
+                document.getElementById('cancelTaskId').value = result.data;
+                document.getElementById('retryTaskId').value = result.data;
+            }
+        } catch (e) {
+            showResult('createResult', '请求失败: ' + e.message, true);
+        }
+    }
+
+    async function getProgress() {
+        const baseUrl = getBaseUrl();
+        const taskId = document.getElementById('progressTaskId').value;
+        if (!taskId) {
+            showResult('progressResult', '请输入任务ID', true);
+            return;
+        }
+        try {
+            const result = await apiRequest(baseUrl + '/api/export/progress/' + taskId, 'GET');
+            showResult('progressResult', result, false);
+            if (result.data && result.data.progress !== undefined) {
+                const progressBar = document.getElementById('progressBar');
+                const progressFill = document.getElementById('progressFill');
+                progressBar.style.display = 'block';
+                progressFill.style.width = result.data.progress + '%';
+                progressFill.textContent = result.data.progress + '%';
+            }
+        } catch (e) {
+            showResult('progressResult', '请求失败: ' + e.message, true);
+        }
+    }
+
+    function startAutoRefresh() {
+        if (autoRefreshTimer) return;
+        autoRefreshTimer = setInterval(getProgress, 2000);
+    }
+
+    function stopAutoRefresh() {
+        if (autoRefreshTimer) {
+            clearInterval(autoRefreshTimer);
+            autoRefreshTimer = null;
+        }
+    }
+
+    async function listRecords() {
+        const baseUrl = getBaseUrl();
+        const query = {
+            pageNum: parseInt(document.getElementById('recordPageNum').value) || 1,
+            pageSize: parseInt(document.getElementById('recordPageSize').value) || 20
+        };
+        const employeeId = document.getElementById('recordEmployeeId').value;
+        const menuCode = document.getElementById('recordMenuCode').value;
+        const status = document.getElementById('recordStatus').value;
+        const subscriberApp = document.getElementById('recordSubscriberApp').value;
+        const startTime = document.getElementById('recordStartTime').value;
+        const endTime = document.getElementById('recordEndTime').value;
+
+        if (employeeId) query.employeeId = parseInt(employeeId);
+        if (menuCode) query.menuCode = menuCode;
+        if (status) query.status = parseInt(status);
+        if (subscriberApp) query.subscriberApp = subscriberApp;
+        if (startTime) query.startTime = startTime;
+        if (endTime) query.endTime = endTime;
+
+        try {
+            const result = await apiRequest(baseUrl + '/api/export/records', 'POST', query);
+            showResult('recordsResult', result, false);
+        } catch (e) {
+            showResult('recordsResult', '请求失败: ' + e.message, true);
+        }
+    }
+
+    async function listTasks() {
+        const baseUrl = getBaseUrl();
+        const params = new URLSearchParams();
+        const pageNum = document.getElementById('taskPageNum').value;
+        const pageSize = document.getElementById('taskPageSize').value;
+        const status = document.getElementById('taskStatus').value;
+
+        if (pageNum) params.append('pageNum', pageNum);
+        if (pageSize) params.append('pageSize', pageSize);
+        if (status) params.append('status', status);
+
+        try {
+            const response = await fetch(baseUrl + '/api/export/list?' + params.toString());
+            const result = await response.json();
+            showResult('taskListResult', result, false);
+        } catch (e) {
+            showResult('taskListResult', '请求失败: ' + e.message, true);
+        }
+    }
+
+    async function downloadFile() {
+        const baseUrl = getBaseUrl();
+        const taskId = document.getElementById('downloadTaskId').value;
+        if (!taskId) {
+            showResult('downloadResult', '请输入任务ID', true);
+            return;
+        }
+        window.open(baseUrl + '/api/export/download/' + taskId, '_blank');
+        showResult('downloadResult', '正在下载文件...\nURL: ' + baseUrl + '/api/export/download/' + taskId, false);
+    }
+
+    async function getDownloadUrl() {
+        const baseUrl = getBaseUrl();
+        const taskId = document.getElementById('downloadTaskId').value;
+        if (!taskId) {
+            showResult('downloadResult', '请输入任务ID', true);
+            return;
+        }
+        try {
+            const result = await apiRequest(baseUrl + '/api/export/download/' + taskId, 'GET');
+            showResult('downloadResult', result, false);
+        } catch (e) {
+            showResult('downloadResult', '请求失败: ' + e.message, true);
+        }
+    }
+
+    async function cancelExport() {
+        const baseUrl = getBaseUrl();
+        const taskId = document.getElementById('cancelTaskId').value;
+        if (!taskId) {
+            showResult('cancelResult', '请输入任务ID', true);
+            return;
+        }
+        try {<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统一导出服务 - 接口演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .config-bar {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-bar label {
+            font-weight: 600;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .config-bar input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .config-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-btn.active {
+            background: #fff;
+            color: #667eea;
+            border-color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .tab-desc {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .api-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .api-info .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+
+        .method-get {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .method-post {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .api-info .url {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: #fff;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-box pre {
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .result-box .success {
+            color: #4ec9b0;
+        }
+
+        .result-box .error {
+            color: #f44747;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .task-id-display {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>统一导出服务 - 接口演示</h1>
+
+        <div class="config-bar">
+            <div class="config-row">
+                <label>服务地址:</label>
+                <input type="text" id="baseUrl" value="" placeholder="自动获取当前地址">
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('create')">创建导出任务</button>
+            <button class="tab-btn" onclick="switchTab('progress')">查询进度</button>
+            <button class="tab-btn" onclick="switchTab('records')">导出记录列表</button>
+            <button class="tab-btn" onclick="switchTab('taskList')">任务列表</button>
+            <button class="tab-btn" onclick="switchTab('download')">下载文件</button>
+            <button class="tab-btn" onclick="switchTab('cancel')">取消任务</button>
+            <button class="tab-btn" onclick="switchTab('retry')">重试任务</button>
+        </div>
+
+        <div id="tab-create" class="tab-content active">
+            <div class="tab-title">创建导出任务</div>
+            <div class="tab-desc">POST /api/export/create - 创建一个新的数据导出任务</div>
+            <div class="api-info">
+                <span class="method method-post">POST</span>
+                <span class="url">/api/export/create</span>
+            </div>
+            <div class="form-group">
+                <label>请求体 (JSON):</label>
+                <textarea id="createRequest">{
+    "userInfo": {
+        "employeeId": 1001,
+        "employeeName": "张三",
+        "deptCode": "DEPT001",
+        "subscriberApp": "web-app"
+    },
+    "menuCode": "order-export",
+    "clientRequestTime": "2026-07-04T10:00:00",
+    "query": {
+        "startDate": "2026-01-01",
+        "endDate": "2026-07-04",
+        "status": 1
+    }
+}</textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="createExport()">创建导出任务</button>
+            </div>
+            <div id="createResult" class="result-box" style="display:none;">
+                <pre></pre>
+            </div>
+        </div>
+
+        <div id="tab-progress" class="tab-content">
+            <div class="tab-title">查询导出进度</div>
+            <div class="tab-desc">GET /api/export/progress/{taskId} - 查询指定任务的导出进度</div>
+            <div class="api-info">
+                <span class="method method-get">GET</span>
+                <span class="url">/api/export/progress/{taskId}</span>
+            </div>
+            <div class="form-group">
+                <label>任务ID (taskId):</label>
+                <input type="text" id="progressTaskId" placeholder="请输入任务ID">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="getProgress()">查询进度</button>
+                <button class="btn btn-success" onclick="startAutoRefresh()">自动刷新</button>
+                <button class="btn btn-danger" onclick="stopAutoRefresh()">停止刷新</button>
+            </div>
+            <div id="progressResult" class="result-box" style="display:none;">
+                <pre></pre>
+            </div>
+            <div id="progressBar" class="progress-bar" style="display:none;">
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+            </div>
+        </div>
+
+        <div id="tab-records" class="tab-content">
+            <div class="tab-title">导出记录列表</div>
+            <div class="tab-desc">POST /api/export/records - 分页查询导出记录</div>
+            <div class="api-info">
+                <span class="method method-post">POST</span>
+                <span class="url">/api/export/records</span>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>员工ID:</label>
+                    <input type="number" id="recordEmployeeId" placeholder="可选">
+                </div>
+                <div class="form-group">
+                    <label>菜单编码:</label>
+                    <input type="text" id="recordMenuCode" placeholder="可选">
+                </div>
+                <div class="form-group">
+                    <label>状态:</label>
+                    <select id="recordStatus">
+                        <option value="">全部</option>
+                        <option value="0">待处理</option>
+                        <option value="1">处理中</option>
+                        <option value="2">成功</option>
+                        <option value="3">失败</option>
+                        <option value="4">已取消</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>订阅应用:</label>
+                    <input type="text" id="recordSubscriberApp" placeholder="可选">
+                </div>
+                <div class="form-group">
+                    <label>开始时间:</label>
+                    <input type="datetime-local" id="recordStartTime">
+                </div>
+                <div class="form-group">
+                    <label>结束时间:</label>
+                    <input type="datetime-local" id="recordEndTime">
+                </div>
+                <div class="form-group">
+                    <label>页码:</label>
+                    <input type="number" id="recordPageNum" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>每页数量:</label>
+                    <input type="number" id="recordPageSize" value="20" min="1" max="100">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="listRecords()">查询记录</button>
+            </div>
+            <div id="recordsResult" class="result-box" style="display:none;">
+                <pre></pre>
+            </div>
+        </div>
+
+        <div id="tab-taskList" class="tab-content">
+            <div class="tab-title">任务列表查询</div>
+            <div class="tab-desc">GET /api/export/list - 分页查询导出任务列表</div>
+            <div class="api-info">
+                <span class="method method-get">GET</span>
+                <span class="url">/api/export/list</span>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>页码:</label>
+                    <input type="number" id="taskPageNum" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>每页数量:</label>
+                    <input type="number" id="taskPageSize" value="20" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label>状态:</label>
+                    <select id="taskStatus">
+                        <option value="">全部</option>
+                        <option value="0">待处理</option>
+                        <option value="1">处理中</option>
+                        <option value="2">成功</option>
+                        <option value="3">失败</option>
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="listTasks()">查询任务</button>
+            </div>
+            <div id="taskListResult" class="result-box" style="display:none;">
+                <pre></pre>
+            </div>
+        </div>
+
+        <div id="tab-download" class="tab-content">
+            <div class="tab-title">下载导出文件</div>
+            <div class="tab-desc">GET /api/export/download/{taskId} - 下载已完成的导出文件</div>
+            <div class="api-info">
+                <span class="method method-get">GET</span>
+                <span class="url">/api/export/download/{taskId}</span>
+            </div>
+            <div class="form-group">
+                <label>任务ID (taskId):</label>
+                <input type="text" id="downloadTaskId" placeholder="请输入任务ID">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="downloadFile()">下载文件</button>
+                <button class="btn btn-primary" onclick="getDownloadUrl()">获取下载URL</button>
+            </div>
+            <div id="downloadResult" class="result-box" style="display:none;">
+                <pre></pre>
+            </div>
+        </div>
+
+        <div id="tab-cancel" class="tab-content">
+            <div class="tab-title">取消导出任务</div>
+            <div class="tab-desc">POST /api/export/cancel/{taskId} - 取消正在执行的导出任务</div>
+            <div class="api-info">
+                <span class="method method-post">POST</span>
+                <span class="url">/api/export/cancel/{taskId}</span>
+            </div>
+            <div class="form-group">
+                <label>任务ID (taskId):</label>
+                <input type="text" id="cancelTaskId" placeholder="请输入任务ID">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-danger" onclick="cancelExport()">取消任务</button>
+            </div>
+            <div id="cancelResult" class="result-box" style="display:none;">
+                <pre></pre>
+            </div>
+        </div>
+
+        <div id="tab-retry" class="tab-content">
+            <div class="tab-title">重试导出任务</div>
+            <div class="tab-desc">POST /api/export/retry/{taskId} - 重试失败的导出任务</div>
+            <div class="api-info">
+                <span class="method method-post">POST</span>
+                <span class="url">/api/export/retry/{taskId}</span>
+            </div>
+            <div class="form-group">
+                <label>任务ID (taskId):</label>
+                <input type="text" id="retryTaskId" placeholder="请输入任务ID">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-warning" onclick="retryExport()">重试任务</button>
+            </div>
+            <div id="retryResult" class="result-box" style="display:none;">
+                <pre></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let autoRefreshTimer = null;
+
+        function getBaseUrl() {
+            const input = document.getElementById('baseUrl').value.trim();
+            if (input) {
+                return input.replace(/\/$/, '');
+            }
+            return window.location.origin;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showResult(elementId, data, isError) {
+            const box = document.getElementById(elementId);
+            box.style.display = 'block';
+            const pre = box.querySelector('pre');
+            pre.className = isError ? 'error' : 'success';
+            pre.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        }
+
+        async function apiRequest(url, method, body) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            if (body && method !== 'GET') {
+                options.body = JSON.stringify(body);
+            }
+            const response = await fetch(url, options);
+            return response.json();
+        }
+
+        async function createExport() {
+            const baseUrl = getBaseUrl();
+            let requestData;
+            try {
+                requestData = JSON.parse(document.getElementById('createRequest').value);
+            } catch (e) {
+                showResult('createResult', 'JSON格式错误: ' + e.message, true);
+                return;
+            }
+            try {
+                const result = await apiRequest(baseUrl + '/api/export/create', 'POST', requestData);
+                showResult('createResult', result, false);
+                if (result.data) {
+                    document.getElementById('progressTaskId').value = result.data;
+                    document.getElementById('downloadTaskId').value = result.data;
+                    document.getElementById('cancelTaskId').value = result.data;
+                    document.getElementById('retryTaskId').value = result.data;
+                }
+            } catch (e) {
+                showResult('createResult', '请求失败: ' + e.message, true);
+            }
+        }
+
+        async function getProgress() {
+            const baseUrl = getBaseUrl();
+            const taskId = document.getElementById('progressTaskId').value;
+            if (!taskId) {
+                showResult('progressResult', '请输入任务ID', true);
+                return;
+            }
+            try {
+                const result = await apiRequest(baseUrl + '/api/export/progress/' + taskId, 'GET');
+                showResult('progressResult', result, false);
+                if (result.data && result.data.progress !== undefined) {
+                    const progressBar = document.getElementById('progressBar');
+                    const progressFill = document.getElementById('progressFill');
+                    progressBar.style.display = 'block';
+                    progressFill.style.width = result.data.progress + '%';
+                    progressFill.textContent = result.data.progress + '%';
+                }
+            } catch (e) {
+                showResult('progressResult', '请求失败: ' + e.message, true);
+            }
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshTimer) return;
+            autoRefreshTimer = setInterval(getProgress, 2000);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshTimer) {
+                clearInterval(autoRefreshTimer);
+                autoRefreshTimer = null;
+            }
+        }
+
+        async function listRecords() {
+            const baseUrl = getBaseUrl();
+            const query = {
+                pageNum: parseInt(document.getElementById('recordPageNum').value) || 1,
+                pageSize: parseInt(document.getElementById('recordPageSize').value) || 20
+            };
+            const employeeId = document.getElementById('recordEmployeeId').value;
+            const menuCode = document.getElementById('recordMenuCode').value;
+            const status = document.getElementById('recordStatus').value;
+            const subscriberApp = document.getElementById('recordSubscriberApp').value;
+            const startTime = document.getElementById('recordStartTime').value;
+            const endTime = document.getElementById('recordEndTime').value;
+
+            if (employeeId) query.employeeId = parseInt(employeeId);
+            if (menuCode) query.menuCode = menuCode;
+            if (status) query.status = parseInt(status);
+            if (subscriberApp) query.subscriberApp = subscriberApp;
+            if (startTime) query.startTime = startTime;
+            if (endTime) query.endTime = endTime;
+
+            try {
+                const result = await apiRequest(baseUrl + '/api/export/records', 'POST', query);
+                showResult('recordsResult', result, false);
+            } catch (e) {
+                showResult('recordsResult', '请求失败: ' + e.message, true);
+            }
+        }
+
+        async function listTasks() {
+            const baseUrl = getBaseUrl();
+            const params = new URLSearchParams();
+            const pageNum = document.getElementById('taskPageNum').value;
+            const pageSize = document.getElementById('taskPageSize').value;
+            const status = document.getElementById('taskStatus').value;
+
+            if (pageNum) params.append('pageNum', pageNum);
+            if (pageSize) params.append('pageSize', pageSize);
+            if (status) params.append('status', status);
+
+            try {
+                const response = await fetch(baseUrl + '/api/export/list?' + params.toString());
+                const result = await response.json();
+                showResult('taskListResult', result, false);
+            } catch (e) {
+                showResult('taskListResult', '请求失败: ' + e.message, true);
+            }
+        }
+
+        async function downloadFile() {
+            const baseUrl = getBaseUrl();
+            const taskId = document.getElementById('downloadTaskId').value;
+            if (!taskId) {
+                showResult('downloadResult', '请输入任务ID', true);
+                return;
+            }
+            window.open(baseUrl + '/api/export/download/' + taskId, '_blank');
+            showResult('downloadResult', '正在下载文件...\nURL: ' + baseUrl + '/api/export/download/' + taskId, false);
+        }
+
+        async function getDownloadUrl() {
+            const baseUrl = getBaseUrl();
+            const taskId = document.getElementById('downloadTaskId').value;
+            if (!taskId) {
+                showResult('downloadResult', '请输入任务ID', true);
+                return;
+            }
+            try {
+                const result = await apiRequest(baseUrl + '/api/export/download/' + taskId, 'GET');
+                showResult('downloadResult', result, false);
+            } catch (e) {
+                showResult('downloadResult', '请求失败: ' + e.message, true);
+            }
+        }
+
+        async function cancelExport() {
+            const baseUrl = getBaseUrl();
+            const taskId = document.getElementById('cancelTaskId').value;
+            if (!taskId) {
+                showResult('cancelResult', '请输入任务ID', true);
+                return;
+            }
+            try {
+                const result = await apiRequest(baseUrl + '/api/export/cancel/' + taskId, 'POST');
+                showResult('cancelResult', result, false);
+            } catch (e) {
+                showResult('cancelResult', '请求失败: ' + e.message, true);
+            }
+        }
+
+        async function retryExport() {
+            const baseUrl = getBaseUrl();
+            const taskId = document.getElementById('retryTaskId').value;
+            if (!taskId) {
+                showResult('retryResult', '请输入任务ID', true);
+                return;
+            }
+            try {
+                const result = await apiRequest(baseUrl + '/api/export/retry/' + taskId, 'POST');
+                showResult('retryResult', result, false);
+            } catch (e) {
+                showResult('retryResult', '请求失败: ' + e.message, true);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('baseUrl').value = window.location.origin;
+        });
+</script>
+</body>
+</html>
+            const result = await apiRequest(baseUrl + '/api/export/cancel/' + taskId, 'POST');
+            showResult('cancelResult', result, false);
+        } catch (e) {
+            showResult('cancelResult', '请求失败: ' + e.message, true);
+        }
+    }
+
+    async function retryExport() {
+        const baseUrl = getBaseUrl();
+        const taskId = document.getElementById('retryTaskId').value;
+        if (!taskId) {
+            showResult('retryResult', '请输入任务ID', true);
+            return;
+        }
+        try {
+            const result = await apiRequest(baseUrl + '/api/export/retry/' + taskId, 'POST');
+            showResult('retryResult', result, false);
+        } catch (e) {
+            showResult('retryResult', '请求失败: ' + e.message, true);
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('baseUrl').value = window.location.origin;
+    });
+</script>
+</body>
+</html>
